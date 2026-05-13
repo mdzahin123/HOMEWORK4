@@ -1,0 +1,21 @@
+<div
+  class="card"
+  [class.face-down]="!card.faceUp"
+  [class.red]="card.color === 'red'"
+  [class.black]="card.color === 'black'"
+  (dblclick)="onDoubleClick()">
+
+  @if (card.faceUp) {
+    <div class="corner top">
+      <div class="value">{{ getCardValue() }}</div>
+      <div class="suit">{{ getSuitSymbol() }}</div>
+    </div>
+    <div class="center">{{ getSuitSymbol() }}</div>
+    <div class="corner bottom">
+      <div class="value">{{ getCardValue() }}</div>
+      <div class="suit">{{ getSuitSymbol() }}</div>
+    </div>
+  } @else {
+    <div class="card-back"></div>
+  }
+</div>

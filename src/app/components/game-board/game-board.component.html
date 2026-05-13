@@ -1,0 +1,135 @@
+<div class="page">
+
+  <!-- Header -->
+  <header class="header">
+    <button class="btn" (click)="startNewGame()">New Game</button>
+    @if (gameWon) {
+      <div class="win-banner">🎉 You won! Click "New Game" to play again.</div>
+    }
+  </header>
+
+  <div class="board">
+
+    <!-- TOP: stock, waste, foundations -->
+    <div class="top-row">
+
+      <!-- Stock -->
+      <div class="pile">
+        <div class="pile-label">Stock</div>
+        <div class="empty-slot" (click)="onDrawCard()">
+          @if (gameState.stock.length > 0) {
+            <div class="card-slot" (click)="onDrawCard()">
+              <app-card [card]="gameState.stock[gameState.stock.length - 1]" [draggable]="false"></app-card>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Waste -->
+      <div class="pile">
+        <div class="pile-label">Waste</div>
+        <div
+          class="empty-slot"
+          cdkDropList
+          id="waste-pile"
+          [cdkDropListData]="gameState.waste"
+          [cdkDropListConnectedTo]="connectedLists"
+          (cdkDropListDropped)="onDrop($event)">
+          @if (gameState.waste.length > 0) {
+            <div
+              class="card-slot"
+              cdkDrag
+              [cdkDragData]="wasteDragData"
+              (cdkDragStarted)="onDragStarted()"
+              (cdkDragEnded)="onDragEnded()">
+              <app-card
+                [card]="gameState.waste[gameState.waste.length - 1]"
+                [draggable]="true"
+                (cardDoubleClick)="onWasteCardDoubleClick($event)">
+              </app-card>
+
+              <!-- Custom preview keeps the drag visual aligned with the cursor -->
+              <div *cdkDragPreview class="drag-preview">
+                <div class="preview-card">
+                  <app-card
+                    [card]="gameState.waste[gameState.waste.length - 1]"
+                    [draggable]="false">
+                  </app-card>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <!-- Foundations -->
+      @for (suit of suits; track suit) {
+        <div class="pile">
+          <div class="pile-label">{{ suitSymbol(suit) }}</div>
+          <div
+            class="empty-slot"
+            cdkDropList
+            [id]="'foundation-' + suit"
+            [cdkDropListData]="getFoundationPile(suit)"
+            [cdkDropListConnectedTo]="connectedLists"
+            (cdkDropListDropped)="onDrop($event)">
+            @if (getFoundationCardForSuit(suit); as topCard) {
+              <div class="card-slot">
+                <app-card [card]="topCard" [draggable]="false"></app-card>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- TABLEAU: 7 columns -->
+    <div class="tableau">
+      @for (i of columnIndices; track i) {
+        <div
+          class="column"
+          cdkDropList
+          [id]="'column-' + i"
+          [cdkDropListData]="gameState.columns[i] || []"
+          [cdkDropListConnectedTo]="connectedLists"
+          (cdkDropListDropped)="onDrop($event)">
+
+          <!-- Empty placeholder fills entire column area when no cards -->
+          @if (!gameState.columns[i] || gameState.columns[i].length === 0) {
+            <div class="empty-column"></div>
+          }
+
+          @for (card of gameState.columns[i]; track card.id; let j = $index) {
+            <div
+              class="card-stack"
+              [class.hidden-during-drag]="isCardBeingDragged(i, j)"
+              cdkDrag
+              [cdkDragDisabled]="!card.faceUp"
+              [cdkDragData]="cardsFrom(i, j)"
+              (cdkDragStarted)="onDragStarted(i, j)"
+              (cdkDragEnded)="onDragEnded()">
+
+              <app-card
+                [card]="card"
+                [draggable]="card.faceUp"
+                (cardDoubleClick)="onCardDoubleClick(card, i)"
+                (click)="onCardClick(i)">
+              </app-card>
+
+              <!-- Custom drag preview: shows the whole stack of cards moving together -->
+              <div *cdkDragPreview class="drag-preview">
+                @for (stackCard of cardsFrom(i, j); track stackCard.id; let k = $index) {
+                  <div class="preview-card" [style.top.px]="k * 26">
+                    <app-card [card]="stackCard" [draggable]="false"></app-card>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

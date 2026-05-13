@@ -1,0 +1,69 @@
+/* Minimalist card: white face, subtle border, traditional layout */
+.card {
+  width: 80px;
+  height: 110px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #d0d0d0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  position: relative;
+  user-select: none;
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.card.red    { color: #c0392b; }
+.card.black  { color: #222; }
+
+.corner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.corner.bottom {
+  align-self: flex-end;
+  transform: rotate(180deg);
+}
+
+.value {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.suit {
+  font-size: 0.95rem;
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  pointer-events: none;
+}
+
+/* Face-down: simple striped back */
+.face-down {
+  background: repeating-linear-gradient(
+    45deg,
+    #4a6fa5,
+    #4a6fa5 6px,
+    #3a5a8a 6px,
+    #3a5a8a 12px
+  );
+  border-color: #2a4a7a;
+  padding: 0;
+}
+
+.card-back {
+  width: 100%;
+  height: 100%;
+}

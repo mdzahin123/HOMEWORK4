@@ -1,0 +1,211 @@
+/* ----- layout ----- */
+
+.page {
+  min-height: calc(100vh - 50px);
+  padding: 20px;
+  background: #2e7d4f; /* classic solitaire-table green */
+}
+
+.header {
+  max-width: 880px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn {
+  background: #fff;
+  color: #222;
+  border: 1px solid #d0d0d0;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.btn:hover {
+  background: #f0f0f0;
+}
+
+.win-banner {
+  background: #fff8c4;
+  color: #6b5400;
+  padding: 8px 14px;
+  border-radius: 4px;
+  border: 1px solid #ddd08a;
+  font-weight: 600;
+}
+
+.board {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+/* ----- top row: stock, waste, foundations ----- */
+
+.top-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  align-items: flex-end;
+}
+
+.pile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.pile-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* Empty slot is the same size as a card. Acts as both the empty placeholder
+   AND the drop-list bounding box. */
+.empty-slot {
+  width: 80px;
+  height: 110px;
+  border: 2px dashed rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  position: relative;
+  background: rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* The card sits on top of the slot, perfectly overlapping it. */
+.card-slot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 110px;
+}
+
+/* ----- tableau ----- */
+
+.tableau {
+  display: grid;
+  grid-template-columns: repeat(7, 80px);
+  gap: 12px;
+  justify-content: start;
+}
+
+.column {
+  position: relative;
+  width: 80px;
+  min-height: 500px;
+}
+
+/* Empty column placeholder sits at the top of the column area. */
+.empty-column {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 110px;
+  border: 2px dashed rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+/* Stacked cards use flow layout with a negative top margin so each card
+   overlaps the one before it by 84px (revealing 26px of the previous card).
+   We deliberately avoid `position: absolute` here: CDK drag-drop's snap-back
+   animation only works correctly for elements in normal flow. With absolute
+   positioning, a rejected drop (or a successful one in a connected list)
+   would leave the card stuck at top:0 of the column. */
+.card-stack {
+  position: relative;
+  width: 80px;
+  height: 110px;
+  margin-top: -84px;
+}
+.card-stack:first-child {
+  margin-top: 0;
+}
+
+/* ----- drag styling ----- */
+
+.cdk-drop-list-dragging .empty-column,
+.cdk-drop-list-dragging .empty-slot {
+  border-color: #ffeb3b;
+  background: rgba(255, 235, 59, 0.15);
+}
+
+/* Custom drag preview that contains a stack of cards */
+.drag-preview {
+  position: relative;
+  width: 80px;
+  min-height: 110px;
+  /* height grows naturally to fit all preview-card children */
+}
+
+.preview-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+}
+
+/* Hide cards in the original column that are being dragged as part of the stack */
+.hidden-during-drag {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Drag preview keeps the same size as the original. */
+.cdk-drag-preview {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+}
+
+/* Placeholder: the faded gap left where the card was. */
+.cdk-drag-placeholder {
+  opacity: 0.35;
+}
+
+.cdk-drag-animating {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Cursor hints */
+.card-stack[cdkDrag]:not(.cdk-drag-disabled),
+.card-slot[cdkDrag] {
+  cursor: grab;
+}
+.cdk-drag-dragging {
+  cursor: grabbing;
+}
+
+/* Responsive: smaller cards on narrow screens */
+@media (max-width: 720px) {
+  .empty-slot, .card-slot, .empty-column, .column, .card-stack {
+    width: 64px;
+  }
+  .empty-slot, .card-slot, .empty-column, .card-stack {
+    height: 88px;
+  }
+  .card-stack {
+    margin-top: -62px; /* 88 - 26 visible offset */
+  }
+  .card-stack:first-child {
+    margin-top: 0;
+  }
+  .tableau {
+    grid-template-columns: repeat(7, 64px);
+    gap: 6px;
+  }
+  .column {
+    min-height: 420px;
+  }
+}
